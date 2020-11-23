@@ -1,6 +1,12 @@
 Using a Cherry ST-1144 and requiring CCID & PCSC and writted for a Debian OS.
 
 Testing for Cardreader using emv.sh
+**to capture the answer to RESET**
+pcsc_scan |grep --line-buffered -i ATR: > log.txt
+
+
+Compile:
+g++ -std=c++0x PCSC.cpp -o pcsc
 
 Enabling coffee maker (Keurig) when proper Bank ID detected using coffee.cpp
 
