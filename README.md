@@ -4,7 +4,7 @@ Testing for Cardreader using emv.sh
 **to capture the answer to RESET**
 pcsc_scan |grep --line-buffered -i ATR: > log.txt
 
-
+GPIO 5,6,13 USED FOR led INDICATION WAITING FOR CARD, CARD ACCEPTED AND UTITILTY
 Compile:
 g++ -std=c++0x PCSC.cpp -o pcsc
 
