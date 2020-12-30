@@ -3,7 +3,7 @@
 #*  Bank of Utica Coffe EMV reader  *
 #* Rev 0.6 Upstate Networks Inc     *
 #************************************
-printf "EMV reader rev 0.6 %b\n"
+printf "EMV reader rev 0.8 %b\n"
 printf "Copyright Upstate Networks Inc 2020 %b\n"
 #**************************************
 #*   Auto detect Card reader          *
@@ -14,6 +14,13 @@ printf "Copyright Upstate Networks Inc 2020 %b\n"
 #Rev 3: main loop strings from scriptor
 #Rev 5 added GPIO lines
 #Rev 6 adds three GPIO lines and handles ctrl-c on exit
+#Rev 7 interrogates ICC for BoU BIC
+#      ICC=Integrated Ciruit Card (bank card)
+#      BoU=Bank of Utica
+#      BIC=Bank Identifier Code
+#      APDU=Application Protocol Data Unit
+#      SW1/2=Status Byte 1 or 2 repsectively
+#Rev 8 Distinguishes between BoU card and others but needs BIC better defined
 
 # Common path for all GPIO access
 BASE_GPIO_PATH=/sys/class/gpio
@@ -94,6 +101,7 @@ allLightsOff
 
 while :
 do
+  allLightsOff  
   a="$(lsusb | grep Cherry)"
   echo $a
   reader=""
@@ -104,8 +112,7 @@ do
       do
         echo "EMV Card Reader not found.  Check connection"
         reader="$(lsusb | grep Cherry)"
-        sleep 3
-      setLightState $RED $ON
+        setLightState $RED $ON
     done
   echo "Card Reader Found: " $reader
  
@@ -114,7 +121,7 @@ do
   echo RESET | scriptor 
  
   b="$(echo RESET | scriptor)"
-  echo $b
+  # echo $b
   while [ -z "$b" ]
   
     do
@@ -123,16 +130,39 @@ do
       echo "Waiting for card insertion"
       sleep .5
       b="$(echo RESET | scriptor)"
-      echo $b
+      #echo $b
       setLightState $RED $OFF
       sleep .5
   done
 
-  echo "Coffee ready, please insert and lower lid"
+  
+  echo "Found Card, check if BIC matches"
     #check BID
     setLightState $YELLOW $ON
-    #sleep 10
+    sleep 2
     #reset system for next user
+    echo "Interrogating ICC for BoU BIC"
+    # echo 00 A4 04 00 | scriptor
+    c="$(echo 00 A4 04 00 | scriptor)"
+    #echo $c
+    #echo 00 A4 04 00 67 | scriptor
+    c="$(echo 00 A4 04 00 67 | scriptor)"
+    echo "This is from scriptor and is string c"
+    echo "******************************"
+    echo $c
+    echo "******************************"
+    #BoU BIC is: 12 91 11 11 01 00 but I think there is a cr/lf screwing this up
+    d='12 91 11'
+    echo $d
+   if [[ "$c" =~ .*"$d".* ]]; then
+      echo "Found bank of Utica Card"
+      echo  -e "\033[33;5;7mCoffee ready, please insert and lower lid\033[0m"
+      setLightState $GREEN $ON
+      sleep 2
+      else
+        echo "BIC does not match: foreign card"
+    fi
+
 
 #end while
 done
