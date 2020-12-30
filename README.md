@@ -1,10 +1,9 @@
-#      ICC=Integrated Ciruit Card (bank card)
-#      BoU=Bank of Utica
-#      BIC=Bank Identifier Code
-#      APDU=Application Protocol Data Unit
-#      SW1/2=Status Byte 1 or 2 repsectively
-
-
+Bank of Utica complimentary coffee EMV card reader
+ ICC=Integrated Ciruit Card (bank card)
+ BoU=Bank of Utica
+ BIC=Bank Identifier Code
+ APDU=Application Protocol Data Unit
+ SW1/2=Status Byte 1 or 2 respectively
 
 Using a Cherry ST-1144 and requiring CCID & PCSC and writted for a Debian OS.
 
